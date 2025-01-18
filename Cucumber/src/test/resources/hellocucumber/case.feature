@@ -8,3 +8,7 @@ Feature: Customer Checkout and Admin Updates Product Availability
     Given an admin logs into the admin panel
     When the admin changes the "Date Available" of the purchased product to a future date
     Then the product availability is updated successfully
+
+
+
+
