@@ -6,7 +6,7 @@
  * and checks out the item
  */
 bthread('User checks out new product', function () {
-    let s1 = new SeleniumSession('userSession')
+    let s1 = new SeleniumSession('userSession');
     s1.start(mainPageURL);
 
     sync({request: Event("End(UserLogin)")}, userLogin(s1, {emailField: 'teamd@qa.com', password: '#TeamDTeamD#'}));
@@ -25,7 +25,7 @@ bthread('User checks out new product', function () {
  * availability to future date
  */
 bthread('Admin Change Availability Date', function () {
-  let s2 = new SeleniumSession('adminSession')
+  let s2 = new SeleniumSession('adminSession');
   s2.start(adminPageURL);
   sync({request:Event("End(AdminLogin)")}, adminLogin(s2,
       {emailField: 'demo@prestashop.com', password: 'prestashop_demo'}));

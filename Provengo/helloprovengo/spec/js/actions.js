@@ -75,9 +75,7 @@ function updateProductAvailability(session, e) {
       formattedDate,
       true
   );
-  session.sleep(2000);
   session.click(xpaths.adminChangeAvailability.saveProductButton);
-  session.sleep(4000);
   session.waitForVisibility(xpaths.adminChangeAvailability.successfulDateUpdate,5000);
 }
 
