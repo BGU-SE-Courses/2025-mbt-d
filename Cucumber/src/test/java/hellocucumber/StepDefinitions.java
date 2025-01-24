@@ -1,78 +1,81 @@
 package hellocucumber;
 
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-//import io.github.bonigarcia.wdm.WebDriverManager;
-
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 public class StepDefinitions {
 
-    WebDriver userDriver = new ChromeDriver();
-    WebDriver adminDriver = new ChromeDriver();
-    WebDriverWait userWait = new WebDriverWait(userDriver, Duration.ofSeconds(10));
-    WebDriverWait adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(10));
+    WebDriver userDriver;
+    WebDriver adminDriver;
+    WebDriverWait userWait;
+    WebDriverWait adminWait;
+
     String mainPageURL = "http://localhost:8080";
     String adminPageURL = "http://localhost:8080/admina";
-    String adminUserName = "demo@prestashop.com";
-    String adminPassword = "prestashop_demo";
-    String userUserName = "teamd@qa.com";
-    String userPassword = "#TeamDTeamD#";
+
+    @Before("@User")
+    public void userSetup() {
+        userDriver = new ChromeDriver();
+        userWait = new WebDriverWait(userDriver, Duration.ofSeconds(10));
+    }
+
+    @Before("@Admin")
+    public void adminSetup() {
+        adminDriver = new ChromeDriver();
+        adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(10));
+    }
+
+    @After("User")
+    public void tearDownUser() {
+        if (adminDriver != null) {
+            adminDriver.quit();
+        }
+    }
+
+    @After("Admin")
+    public void tearDownAdmin() {
+        if (adminDriver != null) {
+            adminDriver.quit();
+        }
+    }
 
 
-//    // $$*TODO* explain what this step does$$
-//    @Given("an example scenario")
-//    public void anExampleScenario() {
-//        driver.get(mainPageURL);
-//    }
-//
-//    // $$*TODO* explain what this step does$$
-//    @When("all step definitions are implemented")
-//    public void allStepDefinitionsAreImplemented() {
-//    }
-//
-//    // $$*TODO* explain what this step does$$
-//    @Then("the scenario passes")
-//    public void theScenarioPasses() {
-//    }
 
+    @Given("a customer navigates and login as {string} and {string}")
+    public void theUserIsOnTheProductPage(String Username, String Password) {
+        // Open the website and login
+        userDriver.get(mainPageURL);
+        userWait.until(ExpectedConditions.elementToBeClickable(By.id("_desktop_user_info"))).click();
+        userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-email"))).sendKeys(Username);
+        userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-password"))).sendKeys(Password);
+        userWait.until(ExpectedConditions.elementToBeClickable(By.id("submit-login"))).click();
+    }
 
-    @Given("a customer navigates to the shop")
-    public void theUserIsOnTheProductPage() {
+    @When("the customer adds a product to their cart")
+    public void customerAddsAProductToCart() throws InterruptedException {
         try {
-            // Open the website and login
-            userDriver.get(mainPageURL);
-            userWait.until(ExpectedConditions.elementToBeClickable(By.id("_desktop_user_info"))).click();
-            userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-email"))).sendKeys(userUserName);
-            userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-password"))).sendKeys(userPassword);
-            userWait.until(ExpectedConditions.elementToBeClickable(By.id("submit-login"))).click();
-
             // Navigate to the product page and customize the product
             userWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(
                     "//a[@href='http://localhost:8080/home-accessories/19-customizable-mug.html']"))).click();
             userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-textField1"))).sendKeys("I Love QA");
             userWait.until(ExpectedConditions.elementToBeClickable(By.name("submitCustomizedData"))).click();
 
-            // Add to cart and proceed to checkout
+            // Add to cart
             userWait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(@class, 'add-to-cart')]"))).click();
             Thread.sleep(1000);
-            userWait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//a[contains(@class, 'btn btn-primary') and contains(@href, 'cart?action=show')]"))).click();
-            userWait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//a[@href='http://localhost:8080/order' and contains(@class, 'btn btn-primary')]"))).click();
 
-        } catch (TimeoutException e) {
-            System.err.println("Timeout occurred: Unable to locate element within the specified time. Check the locator or page load speed.");
-            e.printStackTrace();
-        } catch (NoSuchElementException e) {
-            System.err.println("Element not found: Ensure the locator is correct and the element is present on the page.");
-            e.printStackTrace();
         } catch (InterruptedException e) {
             System.err.println("Thread sleep interrupted: " + e.getMessage());
             Thread.currentThread().interrupt(); // Restore interrupt status
@@ -82,14 +85,90 @@ public class StepDefinitions {
         }
     }
 
-    @When("the customer adds a product to their cart and completes checkout")
-    public void theUserAddsTheProductToTheCart() {
+    @And("proceed to checkout")
+    public void customerProceedToCheckout() throws InterruptedException {
+        userWait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//a[contains(@class, 'btn btn-primary') and contains(@href, 'cart?action=show')]"))).click();
+        userWait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//a[@href='http://localhost:8080/order' and contains(@class, 'btn btn-primary')]"))).click();
+
+        // Adding address
+        WebElement addressField = userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-address1")));
+        addressField.clear();
+        addressField.sendKeys("Los Angeles");
+
+        WebElement cityField = userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-city")));
+        cityField.clear();
+        cityField.sendKeys("Los Angeles");
+
+        WebElement postField = userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-postcode")));
+        postField.clear();
+        postField.sendKeys("12221");
+
+        WebElement countryDropdown = userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-id_country")));
+        Select selectCountry = new Select(countryDropdown);
+        selectCountry.selectByVisibleText("United States");
+
+        WebElement stateDropdown = userWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("field-id_state")));
+        Select selectState = new Select(stateDropdown);
+        selectState.selectByVisibleText("California");
+
+
+        // Continue to Delivery setting
+        userWait.until(ExpectedConditions.elementToBeClickable(By.name("confirm-addresses"))).click();
+        userWait.until(ExpectedConditions.elementToBeClickable(By.name("confirmDeliveryOption"))).click();
+
+        // Agree to terms
+        WebElement termsCheckbox = userWait.until(ExpectedConditions.presenceOfElementLocated(
+                By.id("conditions_to_approve[terms-and-conditions]")));
+
+        JavascriptExecutor js = (JavascriptExecutor) userDriver;
+        js.executeScript("arguments[0].click();", termsCheckbox);
+
+        // Place the order
+        userWait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[@type='submit' and @class='btn btn-primary center-block']"))).click();
+
+    }
+
+    @Then("the order is successfully placed")
+    public void theOrderIsSuccessfullyPlaced() {
+        try {
+            // Wait for the order confirmation element to be visible
+            WebElement orderConfirmation = userWait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.xpath("//*[@id='order-confirmation']")));
+
+            // Assert that the order confirmation element is displayed
+            assertTrue(orderConfirmation.isDisplayed(), "Order confirmation element should be displayed");
+
+            System.out.println("Success: The order was successfully placed.");
+        } catch (TimeoutException e) {
+            System.err.println("Failure: The order confirmation element did not appear in time.");
+            assertFalse(true, "Order confirmation element was not found. The order might not have been placed.");
+        } catch (Exception e) {
+            System.err.println("An unexpected error occurred: " + e.getMessage());
+            assertFalse(true, "An unexpected error occurred while checking the order confirmation element.");
+        }
+    }
+
+
+
+    /////////###############################################################/////////
+
+
+    @Given("an admin logs into the admin panel as {string} and {string}")
+    public void theUserAddsTheProductToTheCart(String Username, String Password) {
         // Open back office and admin login
         adminDriver.get(adminPageURL);
-        adminWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email"))).sendKeys(adminUserName);
-        adminWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("passwd"))).sendKeys(adminPassword);
+        adminWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("email"))).sendKeys(Username);
+        adminWait.until(ExpectedConditions.visibilityOfElementLocated(By.id("passwd"))).sendKeys(Password);
         adminWait.until(ExpectedConditions.elementToBeClickable(By.id("submit_login"))).click();
 
+    }
+
+
+    @When("the admin changes the \"Date Available\" of the purchased product to a future date")
+    public void theAdminChangesDateAvailable() {
         WebElement catalogMenu = adminWait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//li[@id='subtab-AdminCatalog']/a")));
         catalogMenu.click();
@@ -98,28 +177,44 @@ public class StepDefinitions {
                 "//a[@class='text-primary text-nowrap' and contains(@href, 'products-v2/19/edit')]"))).click();
         adminWait.until(ExpectedConditions.elementToBeClickable(By.id("product_stock-tab-nav"))).click();
 
-        LocalDate targetDate = LocalDate.now().plusDays(3);
-        String formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
         // Wait for the date input field to be visible
-        WebElement dateField = adminWait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.id("product_stock_availability_available_date")));
+        WebElement dateField = getDateField();
+        String date = getChangeToDate();
 
-        // Clear the existing value and input the new date
-        dateField.clear();
-        dateField.sendKeys(formattedDate);
+        ((JavascriptExecutor) adminDriver).executeScript(
+                "arguments[0].value = arguments[1];", dateField, date);
+        dateField.sendKeys("");
 
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         adminWait.until(ExpectedConditions.elementToBeClickable(By.id("product_footer_save"))).click();
-
     }
 
-//    @When("")
-//
-//    @When("the admin changes the Date Available of the purchased product to a future date")
-//    public void theAdminChangesDateAvailable() {
-//        userDriver.get(adminPageURL);
-//    }
-//
+    @Then("the product availability is updated successfully")
+    public void theProductAvailabilityIsUpdatedSuccessfully() {
+        // True value from website
+        WebElement dateField = getDateField();
+        String actualDate = dateField.getAttribute("value");
 
+        // The expected value after changing
+        String expectedDate = getChangeToDate();
+
+        // Assert that the actual date matches the expected date
+        assertEquals(actualDate, expectedDate, "Failed:::The product availability date does not match the expected date.");
+        System.out.println("Success:::The product availability is updated successfully");
+    }
+
+    private WebElement getDateField(){
+        return adminWait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.id("product_stock_availability_available_date")));
+    }
+
+    private String getChangeToDate(){
+        LocalDate targetDate = LocalDate.now().plusDays(3);
+        return targetDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 
 }
