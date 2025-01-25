@@ -5,7 +5,7 @@
  * This Story is user open the shop, login, add a product to the cart
  * and checks out the item
  */
-bthread('User checks out new product', function () {
+bthread('UserChecksOutNewProduct', function () {
     let s1 = new SeleniumSession('userSession');
     s1.start(mainPageURL);
 
@@ -24,14 +24,14 @@ bthread('User checks out new product', function () {
  * This story opens up the admin's control page and change product
  * availability to future date
  */
-bthread('Admin Change Availability Date', function () {
-  let s2 = new SeleniumSession('adminSession');
+bthread('AdminChangeAvailabilityDate', function () {
+  let s2 = new SeleniumSession('adminSession')
   s2.start(adminPageURL);
   sync({request:Event("End(AdminLogin)")}, adminLogin(s2,
       {emailField: 'demo@prestashop.com', password: 'prestashop_demo'}));
   sync({request:Event("End(NavigateToEditProduct)")}, navigateToEditProduct(s2, {}));
   sync({request:Event("End(UpdateProductAvailability)")}, updateProductAvailability(s2,
-      {numOfDays: 3}));
+      {newDate: "2026-01-01"}));
 });
 
 bthread("FlowControl", function () {

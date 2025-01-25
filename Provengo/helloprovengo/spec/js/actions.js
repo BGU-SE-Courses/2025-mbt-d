@@ -66,13 +66,9 @@ function updateProductAvailability(session, e) {
   sync({ request: Event("Start(UpdateProductAvailability)") });
 
   session.click(xpaths.adminChangeAvailability.stockTab);
-  const newDate = new Date();
-  newDate.setDate(newDate.getDate() + e.numOfDays);
-  const formattedDate = newDate.toISOString().split("T")[0];
-
   session.writeText(
       xpaths.adminChangeAvailability.productStockAvailableDateField,
-      formattedDate,
+      e.newDate,
       true
   );
   session.click(xpaths.adminChangeAvailability.saveProductButton);
