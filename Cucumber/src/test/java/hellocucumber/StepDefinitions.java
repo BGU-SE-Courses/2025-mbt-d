@@ -25,18 +25,27 @@ public class StepDefinitions {
     String mainPageURL = "http://localhost:8080";
     String adminPageURL = "http://localhost:8080/admina";
 
+    /**
+     * The function role is to start a ChromeDriver and WebDriver for the user use case
+     */
     @Before("@User")
     public void userSetup() {
         userDriver = new ChromeDriver();
         userWait = new WebDriverWait(userDriver, Duration.ofSeconds(10));
     }
 
+    /**
+     * The function role is to start a ChromeDriver and WebDriver for the admin use case
+     */
     @Before("@Admin")
     public void adminSetup() {
         adminDriver = new ChromeDriver();
         adminWait = new WebDriverWait(adminDriver, Duration.ofSeconds(10));
     }
 
+    /**
+     * After user finish quit the driver
+     */
     @After("User")
     public void tearDownUser() {
         if (adminDriver != null) {
@@ -44,6 +53,9 @@ public class StepDefinitions {
         }
     }
 
+    /**
+     * After admin finish quit the driver
+     */
     @After("Admin")
     public void tearDownAdmin() {
         if (adminDriver != null) {
@@ -52,7 +64,11 @@ public class StepDefinitions {
     }
 
 
-
+    /**
+     * Go to PrestaShop website and preform login to the user
+     * @param Username the user's username for the PrestaShop application
+     * @param Password the user's password for the PrestaShop application
+     */
     @Given("a customer navigates and login as {string} and {string}")
     public void theUserIsOnTheProductPage(String Username, String Password) {
         // Open the website and login
@@ -63,8 +79,12 @@ public class StepDefinitions {
         userWait.until(ExpectedConditions.elementToBeClickable(By.id("submit-login"))).click();
     }
 
+    /**
+     * User adds the wanted product to the cart
+     * @throws InterruptedException
+     */
     @When("the customer adds a product to their cart")
-    public void customerAddsAProductToCart() throws InterruptedException {
+    public void userAddsAProductToCart() throws InterruptedException {
         try {
             // Navigate to the product page and customize the product
             userWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(
@@ -85,8 +105,12 @@ public class StepDefinitions {
         }
     }
 
+    /**
+     * The user proceed to the checkout and fills details including address, delivery and payment
+     * @throws InterruptedException
+     */
     @And("proceed to checkout")
-    public void customerProceedToCheckout() throws InterruptedException {
+    public void userProceedToCheckout() {
         userWait.until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//a[contains(@class, 'btn btn-primary') and contains(@href, 'cart?action=show')]"))).click();
         userWait.until(ExpectedConditions.elementToBeClickable(
@@ -131,6 +155,9 @@ public class StepDefinitions {
 
     }
 
+    /**
+     * Test checks if the user were able to purchase the product
+     */
     @Then("the order is successfully placed")
     public void theOrderIsSuccessfullyPlaced() {
         try {
@@ -155,7 +182,11 @@ public class StepDefinitions {
 
     /////////###############################################################/////////
 
-
+    /**
+     * Go to PrestaShop admin's page and preform login to the admin account
+     * @param Username the admin's username for the PrestaShop application
+     * @param Password the admin's password for the PrestaShop application
+     */
     @Given("an admin logs into the admin panel as {string} and {string}")
     public void theUserAddsTheProductToTheCart(String Username, String Password) {
         // Open back office and admin login
@@ -166,7 +197,9 @@ public class StepDefinitions {
 
     }
 
-
+    /**
+     * Admin changes the product availability to a future date
+     */
     @When("the admin changes the \"Date Available\" of the purchased product to a future date")
     public void theAdminChangesDateAvailable() {
         WebElement catalogMenu = adminWait.until(ExpectedConditions.elementToBeClickable(
@@ -193,6 +226,9 @@ public class StepDefinitions {
         adminWait.until(ExpectedConditions.elementToBeClickable(By.id("product_footer_save"))).click();
     }
 
+    /**
+     * Test if admin were able to successfully change the product's availability date
+     */
     @Then("the product availability is updated successfully")
     public void theProductAvailabilityIsUpdatedSuccessfully() {
         // True value from website

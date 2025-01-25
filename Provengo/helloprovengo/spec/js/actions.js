@@ -33,7 +33,7 @@ function addProductToCartAndCheckOut(session, e) {
 
 
 function fillCheckoutDetails(session, e) {
-  sync({ request: Event("Start(FillCheckoutDetails)") });
+  sync({ request: Event("Start(UserFillCheckoutDetails)") });
 
   session.writeText(xpaths.userFillDetails.addressField, e.address);
   session.writeText(xpaths.userFillDetails.cityField, e.city);
@@ -55,7 +55,7 @@ function fillCheckoutDetails(session, e) {
 
 
 function navigateToEditProduct(session, e) {
-  sync({ request: Event("Start(NavigateToEditProduct)") });
+  sync({ request: Event("Start(AdminNavigateToEditProduct)") });
 
   session.click(xpaths.adminSelectItem.catalogMenu);
   session.click(xpaths.adminSelectItem.productsTab);
@@ -63,7 +63,7 @@ function navigateToEditProduct(session, e) {
 }
 
 function updateProductAvailability(session, e) {
-  sync({ request: Event("Start(UpdateProductAvailability)") });
+  sync({ request: Event("Start(AdminUpdateProductAvailability)") });
 
   session.click(xpaths.adminChangeAvailability.stockTab);
   session.writeText(
@@ -77,35 +77,3 @@ function updateProductAvailability(session, e) {
 
 
 
-// function assertProductAvailabilityUpdated(session, e) {
-//   sync({ request: Event("Start(AssertProductAvailabilityUpdated)") });
-//
-//   const expectedDate = new Date();
-//   expectedDate.setDate(expectedDate.getDate() + 3);
-//   const formattedDate = expectedDate.toISOString().split("T")[0];
-//
-//   const actualDate = session.readText(
-//       xpaths.adminChangeAvailability.productStockAvailableDateField
-//   );
-//
-// }
-//
-// function assertOrderSuccess(session, e) {
-//   sync({ request: Event("Start(AssertOrderSuccess)") });
-//
-//   session.waitForVisibility(xpaths.userFillDetails.orderConfirmation);
-// }
-
-
-// function userLogout(session, e) {
-//   sync({ request: Event("UserLogout") });
-//
-//   session.click(xpaths.userWindowLogin.desktopUserInfo);
-//   session.click(xpaths.userAddItem.addToCartButton); // Adjust based on logout button location
-// }
-//
-// function adminLogout(session, e) {
-//   sync({ request: Event("AdminLogout") });
-//
-//   session.click(xpaths.userWindowLogin.desktopUserInfo); // Update XPath for admin logout
-// }

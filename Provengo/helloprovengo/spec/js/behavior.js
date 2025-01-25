@@ -11,7 +11,7 @@ bthread('UserChecksOutNewProduct', function () {
 
     sync({request: Event("End(UserLogin)")}, userLogin(s1, {emailField: 'teamd@qa.com', password: '#TeamDTeamD#'}));
     sync({request: Event("End(UserAddProductToCart)")}, addProductToCartAndCheckOut(s1, {text: 'I Love QA'}));
-    sync({request: Event("End(FillCheckoutDetails)")}, fillCheckoutDetails(s1, {
+    sync({request: Event("End(UserFillCheckoutDetails)")}, fillCheckoutDetails(s1, {
         address: "Los Angeles 111",
         city: "Los Angeles",
         postcode: "12221",
@@ -29,19 +29,21 @@ bthread('AdminChangeAvailabilityDate', function () {
   s2.start(adminPageURL);
   sync({request:Event("End(AdminLogin)")}, adminLogin(s2,
       {emailField: 'demo@prestashop.com', password: 'prestashop_demo'}));
-  sync({request:Event("End(NavigateToEditProduct)")}, navigateToEditProduct(s2, {}));
-  sync({request:Event("End(UpdateProductAvailability)")}, updateProductAvailability(s2,
+  sync({request:Event("End(AdminNavigateToEditProduct)")}, navigateToEditProduct(s2, {}));
+  sync({request:Event("End(AdminUpdateProductAvailability)")}, updateProductAvailability(s2,
       {newDate: "2026-01-01"}));
 });
 
 bthread("FlowControl", function () {
-    // Ensure End(UserAddProductToCart) occurs before Start(UpdateProductAvailability)
-    sync({ waitFor: Event("End(UserAddProductToCart)") });
-    sync({ waitFor: Event("Start(UpdateProductAvailability)"), block: Event("Start(UpdateProductAvailability)") });
+    // Ensure user add the product to the cart before admin changes availability data
+    sync({ waitFor: Event("End(UserAddProductToCart)"), block: Event("Start(AdminUpdateProductAvailability)") });
+    // sync({ waitFor: Event("End(AdminUpdateProductAvailability)"), block: Event("Start(UserFillCheckoutDetails)")});
 
-    // Ensure End(UpdateProductAvailability) occurs before Start(FillCheckoutDetails)
-    sync({ waitFor: Event("End(UpdateProductAvailability)") });
-    sync({ waitFor: Event("Start(FillCheckoutDetails)"), block: Event("Start(FillCheckoutDetails)") });
 });
 
 
+bthread("FlowControl2", function () {
+    // Ensure admin changes avai;ability date before user proceed with check out
+    sync({ waitFor: Event("End(AdminUpdateProductAvailability)"), block: Event("Start(UserFillCheckoutDetails)")});
+
+});
