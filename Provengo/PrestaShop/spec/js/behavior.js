@@ -34,16 +34,15 @@ bthread('AdminChangeAvailabilityDate', function () {
       {newDate: "2026-01-01"}));
 });
 
-bthread("FlowControl", function () {
+bthread("FlowControl_AddProductThanAvailability", function () {
     // Ensure user add the product to the cart before admin changes availability data
     sync({ waitFor: Event("End(UserAddProductToCart)"), block: Event("Start(AdminUpdateProductAvailability)") });
-    // sync({ waitFor: Event("End(AdminUpdateProductAvailability)"), block: Event("Start(UserFillCheckoutDetails)")});
 
 });
 
 
-bthread("FlowControl2", function () {
-    // Ensure admin changes avai;ability date before user proceed with check out
+bthread("FlowControl_AvailabilityUpdateThanUserCheckOut", function () {
+    // Ensure admin changes availability date before user proceed with check out
     sync({ waitFor: Event("End(AdminUpdateProductAvailability)"), block: Event("Start(UserFillCheckoutDetails)")});
 
 });

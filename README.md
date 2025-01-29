@@ -2,31 +2,28 @@
 This is a repository for the system-testing assignment of the Software Quality Engineering course at the [Ben-Gurion University](https://in.bgu.ac.il/), Israel.
 
 ## Assignment Description
-In this assignment, we tested an open-source software called [$$*TODO* software name$$](https://address-of-the-project.com).
+In this assignment, we tested an open-source software called [PrestaShop](https://demo.prestashop.com/#/en/front).
 
-$$*TODO* Add some general description about the software$$
+PrestaShop is an open-source e-commerce platform that enables users to create and manage online stores with ease. It provides an intuitive interface for handling products, customers, orders, and payments, making it accessible to a wide range of users.
 
 ## Installation
-$$*TODO* Write instructions on how to install the software and prepare the testing environment$$
+1. Download PrestaShop (follow instructions in [here](https://docs.prestashop-project.org/v.8-documentation/getting-started)).
+2. Make Sure to set up local server and configure local database.
+3. Configure maven dependencies for Cucumber and Selenium.
+4. Download ChromeDriver according to your Google Chrome version and place it in the Selenium directory.
 
 ## What we tested
-$$*TODO* Add a description of the module and the user stories that you chose to test.
-For example, in the case of the Moodle example, you can write something like this:
+We tested the checkout process for customers and the ability of an admin to update a product's availability date. We focused on the following user stories:
 
-We tested the quiz module that allows for creating and taking quizzes. We chose to test the following user stories: 
+User story: A customer completes the checkout process for an item.
 
-*User story:* A teacher adds a new quiz to the course with two yes/no questions
+Preconditions: A product is available for purchase.
+Expected outcome: The customer successfully places an order, and the order details are recorded.
 
-*Preconditions:* There is a course with a teacher
+User story: An admin updates the "Date Available" field for a product to a future date.
 
-*Expected outcome:* The quiz is added to the course.
-
-*User story:* A students attempts a quiz and answers correctly.
-
-*Preconditions:* There is a course with a quiz with two yes/no questions and the quiz grade is calculated automatically and the grade is visible to the students upon submission.
-
-*Expected outcome:* The student receives 100.
-$$
+Preconditions: The admin has access to the product catalog and editing permissions.
+Expected outcome: The product's availability date is updated, and customers can see the change.
 
 ## How we tested
 We used two different testing methods:
@@ -35,18 +32,15 @@ We used two different testing methods:
 
 Each of the testing methods is elaborated in its own directory. 
 
-## Results
-Update all README.md files (except for d-e, see Section 1). Specifically, replace all $$*TODO*…$$ according to the instructions inside the $$.
 
 ## Detected Bugs
 We detected the following bugs:
 
 1. Bug 1: 
-   1. General description: ...
-   2. Steps to reproduce: ...
-   3. Expected result: ...
-   4. Actual result: ...
-   5. Link to the bug report: (you are encouraged to report the bug to the developers of the software)
-2. Bug 2: ...
+   1. When Admin changes the data availability of a product, customer can still purchase the product.
+   2. Steps to reproduce: Customer adds product to the cart, at that time admin changes the product availability to a future date, than customer proceed to check out.
+   3. Expected result: Customer gets a decline message and not able to proceed to check out
+   4. Actual result: Customer is able to purchase an unavailable product.
 
-$$*TODO* if you did not detect the bug, you should delete this section$$  
+
+
